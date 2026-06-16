@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Tabela — Okey Skor Defteri</title>
-<meta name="description" content="Okey için kurulum gerektirmeyen skor tablosu. Skorun otomatik kaydedilir, sayfayı kapatsan da kaybolmaz.">
+<title>SkorTab — Skor Defteri</title>
+<meta name="description" content="Kurulum gerektirmeyen evrensel skor tablosu. Okey, 101, Batak ve her oyun için. Skorun otomatik kaydedilir.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <script>
 (function(){
-  try{ document.documentElement.setAttribute("data-color-scheme", localStorage.getItem("tabela.theme.v1") || "system"); }
+  try{ document.documentElement.setAttribute("data-color-scheme", localStorage.getItem("skortab.theme.v1") || "system"); }
   catch(e){ document.documentElement.setAttribute("data-color-scheme", "system"); }
 })();
 </script>
@@ -49,7 +49,6 @@
     }
   }
 
-  /* sütun renkleri — uyumlu, ayırt edilebilir palet */
   :root .col0,[data-color-scheme="light"] .col0{--head:#9E5A63;--fade:#E8D2D5;--pillsoft:#F6ECEE;--deep:#6B3D44;--txt:#fff}
   :root .col1,[data-color-scheme="light"] .col1{--head:#4F6D8F;--fade:#D2DCE8;--pillsoft:#ECF1F6;--deep:#354E68;--txt:#fff}
   :root .col2,[data-color-scheme="light"] .col2{--head:#9A7B4F;--fade:#E8DCC4;--pillsoft:#F5EFE3;--deep:#6B5435;--txt:#fff}
@@ -72,12 +71,25 @@
 
   .topbar{position:sticky;top:0;z-index:20;background:var(--felt);color:var(--felt-text);
     padding:calc(env(safe-area-inset-top) + 12px) 18px 12px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 2px 10px rgba(0,0,0,.12)}
-  .brand{display:flex;align-items:center;gap:9px;font-weight:700;font-size:18px;letter-spacing:-.01em;flex-shrink:0}
-  .brand .dot{width:11px;height:11px;border-radius:3px;background:var(--brand-a);box-shadow:6px 0 0 -2px var(--brand-b), 12px 0 0 -2px var(--brand-c)}
-  .topbar-right{display:flex;align-items:center;gap:10px;min-width:0}
-  .saved{font-size:12.5px;color:var(--felt-muted);display:flex;align-items:center;gap:5px;opacity:0;transition:opacity .25s;white-space:nowrap;flex-shrink:0}
+
+  /* Logo */
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px;letter-spacing:-.02em;flex-shrink:0;text-decoration:none;color:inherit}
+  .brand-icon{width:30px;height:30px;flex-shrink:0}
+  .brand-name{display:flex;flex-direction:column;line-height:1;gap:1px}
+  .brand-name .b1{font-size:15px;font-weight:700;color:var(--felt-text);letter-spacing:-.01em}
+  .brand-name .b2{font-size:10px;font-weight:500;color:var(--felt-muted);letter-spacing:.04em;text-transform:uppercase}
+
+  .topbar-right{display:flex;align-items:center;gap:8px;min-width:0}
+  .saved{font-size:12px;color:var(--felt-muted);display:flex;align-items:center;gap:5px;opacity:0;transition:opacity .25s;white-space:nowrap;flex-shrink:0}
   .saved.show{opacity:1}
   .saved::before{content:"✓";font-weight:700}
+
+  /* Dil butonu */
+  .lang-btn{appearance:none;border:0;background:rgba(255,255,255,.10);color:var(--felt-text);cursor:pointer;
+    border-radius:8px;padding:5px 9px;font:inherit;font-size:15px;line-height:1;flex-shrink:0;
+    display:flex;align-items:center;gap:5px;transition:.12s}
+  .lang-btn:hover{background:rgba(255,255,255,.18)}
+  .lang-btn .lang-label{font-size:11px;font-weight:600;color:rgba(226,238,232,.75);letter-spacing:.04em}
 
   main{max-width:560px;margin:0 auto;padding:16px 16px 120px}
 
@@ -149,34 +161,62 @@
 </head>
 <body>
   <div class="topbar">
-    <div class="brand"><span class="dot"></span> Tabela</div>
-    <div class="topbar-right">
-      <div class="seg" id="seg-theme">
-        <button data-theme="system">Sistem</button>
-        <button data-theme="light">Açık</button>
-        <button data-theme="dark">Koyu</button>
+    <!-- Logo -->
+    <div class="brand">
+      <svg class="brand-icon" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Grid table icon -->
+        <rect x="2" y="2" width="26" height="26" rx="6" fill="rgba(255,255,255,0.12)"/>
+        <!-- Header row -->
+        <rect x="2" y="2" width="26" height="9" rx="6" fill="rgba(255,255,255,0.22)"/>
+        <rect x="2" y="8" width="26" height="3" fill="rgba(255,255,255,0.22)"/>
+        <!-- Column dividers -->
+        <rect x="10" y="2" width="1.5" height="26" fill="rgba(255,255,255,0.12)"/>
+        <rect x="19.5" y="2" width="1.5" height="26" fill="rgba(255,255,255,0.12)"/>
+        <!-- Row dividers -->
+        <rect x="2" y="17" width="26" height="1.5" fill="rgba(255,255,255,0.12)"/>
+        <rect x="2" y="23" width="26" height="1.5" fill="rgba(255,255,255,0.12)"/>
+        <!-- Star in header -->
+        <text x="15" y="9.5" text-anchor="middle" font-size="6" fill="rgba(196,165,116,1)">★</text>
+      </svg>
+      <div class="brand-name">
+        <span class="b1">SkorTab</span>
+        <span class="b2" id="brand-sub">Skor Defteri</span>
       </div>
-      <div class="saved" id="saved">Kaydedildi</div>
+    </div>
+
+    <div class="topbar-right">
+      <!-- Dil seçici -->
+      <button class="lang-btn" id="lang-btn" title="Dil / Language">
+        <span id="lang-flag">🇹🇷</span>
+        <span class="lang-label" id="lang-label">TR</span>
+      </button>
+      <!-- Tema seçici -->
+      <div class="seg" id="seg-theme">
+        <button data-theme="system" id="theme-sys">Sys</button>
+        <button data-theme="light" id="theme-light">☀</button>
+        <button data-theme="dark" id="theme-dark">☾</button>
+      </div>
+      <div class="saved" id="saved">—</div>
     </div>
   </div>
 
   <main>
     <div class="modebar">
       <div class="seg" id="seg-mode">
-        <button data-mode="essiz">Eşsiz</button>
-        <button data-mode="esli">Eşli</button>
+        <button data-mode="essiz" id="mode-essiz">—</button>
+        <button data-mode="esli" id="mode-esli">—</button>
       </div>
     </div>
 
     <div id="board"></div>
-    <button class="add-el" id="add-el"><span class="plus">+</span> Yeni el</button>
+    <button class="add-el" id="add-el"><span class="plus">+</span> <span id="lbl-add">—</span></button>
 
     <div class="toolbar">
-      <button class="btn btn-ghost" id="undo">Son eli geri al</button>
-      <button class="btn btn-ghost" id="new-table">Yeni tablo</button>
-      <button class="btn btn-ghost danger" id="new-game">Yeni oyun</button>
+      <button class="btn btn-ghost" id="undo"><span id="lbl-undo">—</span></button>
+      <button class="btn btn-ghost" id="new-table"><span id="lbl-newtable">—</span></button>
+      <button class="btn btn-ghost danger" id="new-game"><span id="lbl-newgame">—</span></button>
     </div>
-    <div class="backup"><button id="copy-link">🔗 Yedek linki kopyala</button></div>
+    <div class="backup"><button id="copy-link">🔗 <span id="lbl-copylink">—</span></button></div>
   </main>
 
   <div class="overlay" id="overlay">
@@ -184,8 +224,8 @@
       <h3 id="ov-title">—</h3>
       <p id="ov-msg">—</p>
       <div class="row">
-        <button class="btn btn-cancel" id="ov-cancel">Vazgeç</button>
-        <button class="btn btn-danger" id="ov-ok">Tamam</button>
+        <button class="btn btn-cancel" id="ov-cancel">—</button>
+        <button class="btn btn-danger" id="ov-ok">—</button>
       </div>
     </div>
   </div>
@@ -195,12 +235,110 @@
 <script>
 (function(){
   "use strict";
-  var KEY = "tabela.okey.v1";
-  var THEME_KEY = "tabela.theme.v1";
+  var KEY = "skortab.v1";
+  var THEME_KEY = "skortab.theme.v1";
+  var LANG_KEY = "skortab.lang.v1";
   var PEN = "<span class='pen'><svg viewBox='0 0 24 24' width='12' height='12' fill='none' stroke='currentColor' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 20h9'/><path d='M16.5 3.5a2.05 2.05 0 0 1 2.9 2.9L7 19l-4 1 1-4Z'/></svg></span>";
 
   var state = null;
 
+  // ---- i18n ----
+  var I18N = {
+    tr: {
+      brandSub: "Skor Defteri",
+      modeEssiz: "Eşsiz",
+      modeEsli: "Eşli",
+      addRound: "Yeni el",
+      undo: "Son eli geri al",
+      newTable: "Yeni tablo",
+      newGame: "Yeni oyun",
+      copyLink: "Yedek linki kopyala",
+      saved: "Kaydedildi",
+      cancel: "Vazgeç",
+      ok: "Tamam",
+      player: ["Oyuncu 1","Oyuncu 2","Oyuncu 3","Oyuncu 4"],
+      team: ["Takım 1","Takım 2"],
+      confirmNewTable: { title:"Yeni tablo?", msg:"Tüm el puanları silinecek. Oyuncu isimleri aynı kalacak. Emin misiniz?", ok:"Evet, sıfırla" },
+      confirmNewGame: { title:"Yeni oyun?", msg:"Tablo ve oyuncu isimleri sıfırlanacak. Emin misiniz?", ok:"Evet, başla" },
+      confirmMode: { title:"Düzen değişsin mi?", msg:"Eşli/eşsiz değişince mevcut skorlar sıfırlanır.", ok:"Evet, değiştir" },
+      toastTableReset: "Tablo sıfırlandı",
+      toastNewGame: "Yeni oyun başladı",
+      toastLinkCopied: "Yedek linki kopyalandı",
+      toastLinkFail: "Link oluşturulamadı",
+      toastSaveFail: "Kaydedilemedi — gizli modda olabilirsin",
+      themeSys: "Sys"
+    },
+    en: {
+      brandSub: "Score Keeper",
+      modeEssiz: "Singles",
+      modeEsli: "Teams",
+      addRound: "New round",
+      undo: "Undo last round",
+      newTable: "New table",
+      newGame: "New game",
+      copyLink: "Copy backup link",
+      saved: "Saved",
+      cancel: "Cancel",
+      ok: "OK",
+      player: ["Player 1","Player 2","Player 3","Player 4"],
+      team: ["Team 1","Team 2"],
+      confirmNewTable: { title:"New table?", msg:"All round scores will be deleted. Player names will stay. Are you sure?", ok:"Yes, reset" },
+      confirmNewGame: { title:"New game?", msg:"Table and player names will be reset. Are you sure?", ok:"Yes, start" },
+      confirmMode: { title:"Switch layout?", msg:"Switching between singles/teams will reset current scores.", ok:"Yes, switch" },
+      toastTableReset: "Table reset",
+      toastNewGame: "New game started",
+      toastLinkCopied: "Backup link copied",
+      toastLinkFail: "Could not create link",
+      toastSaveFail: "Could not save — you may be in private mode",
+      themeSys: "Sys"
+    }
+  };
+
+  var lang = "tr";
+
+  function t(key){ return I18N[lang][key]; }
+
+  function detectLang(){
+    try{
+      var saved = localStorage.getItem(LANG_KEY);
+      if(saved === "tr" || saved === "en") return saved;
+    }catch(e){}
+    var nav = (navigator.language || navigator.userLanguage || "tr").toLowerCase();
+    return nav.startsWith("tr") ? "tr" : "en";
+  }
+
+  function applyLang(l){
+    lang = l;
+    try{ localStorage.setItem(LANG_KEY, lang); }catch(e){}
+    document.documentElement.setAttribute("lang", lang);
+    // Flag & label
+    document.getElementById("lang-flag").textContent = lang === "tr" ? "🇹🇷" : "🇬🇧";
+    document.getElementById("lang-label").textContent = lang === "tr" ? "TR" : "EN";
+    // Brand
+    document.getElementById("brand-sub").textContent = t("brandSub");
+    // Saved indicator
+    document.getElementById("saved").textContent = t("saved");
+    // Mode buttons
+    document.getElementById("mode-essiz").textContent = t("modeEssiz");
+    document.getElementById("mode-esli").textContent = t("modeEsli");
+    // Action buttons
+    document.getElementById("lbl-add").textContent = t("addRound");
+    document.getElementById("lbl-undo").textContent = t("undo");
+    document.getElementById("lbl-newtable").textContent = t("newTable");
+    document.getElementById("lbl-newgame").textContent = t("newGame");
+    document.getElementById("lbl-copylink").textContent = t("copyLink");
+    // Modal buttons
+    document.getElementById("ov-cancel").textContent = t("cancel");
+    // Title tag
+    document.title = "SkorTab — " + t("brandSub");
+    if(state) render();
+  }
+
+  function toggleLang(){
+    applyLang(lang === "tr" ? "en" : "tr");
+  }
+
+  // ---- theme ----
   function loadTheme(){ try{ return localStorage.getItem(THEME_KEY) || "system"; }catch(e){ return "system"; } }
   function applyTheme(pref){
     document.documentElement.setAttribute("data-color-scheme", pref);
@@ -212,8 +350,9 @@
     for(var i=0;i<btns.length;i++) btns[i].classList.toggle("on", btns[i].getAttribute("data-theme")===pref);
   }
 
+  // ---- state ----
   function names(mode){
-    return mode==="esli" ? ["Takım 1","Takım 2"] : ["Oyuncu 1","Oyuncu 2","Oyuncu 3","Oyuncu 4"];
+    return mode==="esli" ? t("team") : t("player");
   }
   function newState(mode){
     var cols = names(mode);
@@ -227,7 +366,7 @@
     if(!state) return;
     state.updatedAt = Date.now();
     try{ localStorage.setItem(KEY, JSON.stringify(state)); flashSaved(); }
-    catch(e){ toast("Kaydedilemedi — gizli modda olabilirsin"); }
+    catch(e){ toast(t("toastSaveFail")); }
   }
   function loadSaved(){
     try{ var r = localStorage.getItem(KEY); return r ? JSON.parse(r) : null; }catch(e){ return null; }
@@ -243,10 +382,10 @@
   }
   var toastTimer;
   function toast(msg){
-    var t = document.getElementById("toast");
-    t.textContent = msg; t.classList.add("show");
+    var t2 = document.getElementById("toast");
+    t2.textContent = msg; t2.classList.add("show");
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(function(){ t.classList.remove("show"); }, 2200);
+    toastTimer = setTimeout(function(){ t2.classList.remove("show"); }, 2200);
   }
 
   // ---- confirm modal ----
@@ -262,14 +401,14 @@
 
   // ---- compute ----
   function totals(){
-    var n = state.cols.length, t = new Array(n).fill(0);
-    for(var r=0;r<state.rows.length;r++) for(var c=0;c<n;c++) t[c]+=(state.rows[r][c]||0);
-    return t;
+    var n = state.cols.length, tot = new Array(n).fill(0);
+    for(var r=0;r<state.rows.length;r++) for(var c=0;c<n;c++) tot[c]+=(state.rows[r][c]||0);
+    return tot;
   }
-  function leaderIdx(t){
-    if(t.every(function(v){ return v===0; })) return [];
-    var best = Math.max.apply(null, t), idx=[];
-    for(var i=0;i<t.length;i++) if(t[i]===best) idx.push(i);
+  function leaderIdx(tot){
+    if(tot.every(function(v){ return v===0; })) return [];
+    var best = Math.max.apply(null, tot), idx=[];
+    for(var i=0;i<tot.length;i++) if(tot[i]===best) idx.push(i);
     return idx;
   }
   function escapeHtml(s){ return String(s).replace(/[&<>"']/g,function(m){return ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[m];}); }
@@ -282,25 +421,22 @@
     board.style.gridTemplateColumns = "repeat("+n+",1fr)";
 
     var h = "";
-    // isim hapları (yerinde düzenlenebilir)
     for(var c=0;c<n;c++){
       var isSet = !!(state.named && state.named[c]);
       var val = isSet ? state.cols[c] : "";
       var ph = names(state.mode)[c];
       h += "<div class='pill col"+(c%4)+" "+(isSet?"is-set":"is-default")+"'>"+
-             "<input class='nm' type='text' maxlength='16' data-c='"+c+"' aria-label='İsim' "+
+             "<input class='nm' type='text' maxlength='16' data-c='"+c+"' aria-label='"+escapeHtml(ph)+"' "+
                     "value='"+escapeHtml(val)+"' placeholder='"+escapeHtml(ph)+"'>"+ PEN +
            "</div>";
     }
-    // toplam blokları
     for(var c2=0;c2<n;c2++){
       h += "<div class='total col"+(c2%4)+"'><span class='v num' data-total='"+c2+"'>0</span></div>";
     }
-    // el hücreleri (numara yok)
     for(var r=0;r<state.rows.length;r++){
       for(var c3=0;c3<n;c3++){
-        var val = state.rows[r][c3];
-        h += "<div class='cellbox col"+(c3%4)+"'><input type='number' inputmode='numeric' data-r='"+r+"' data-c='"+c3+"' value='"+(val===0?"":val)+"' placeholder='0'></div>";
+        var v = state.rows[r][c3];
+        h += "<div class='cellbox col"+(c3%4)+"'><input type='number' inputmode='numeric' data-r='"+r+"' data-c='"+c3+"' value='"+(v===0?"":v)+"' placeholder='0'></div>";
       }
     }
     board.innerHTML = h;
@@ -310,10 +446,10 @@
       pill.addEventListener("mousedown", function(e){ if(e.target!==inp){ e.preventDefault(); inp.focus(); } });
       pill.addEventListener("touchstart", function(e){ if(e.target!==inp){ inp.focus(); } }, {passive:true});
       inp.addEventListener("focus", function(){
-        var v=this, c=parseInt(this.getAttribute("data-c"),10), pill=this.parentNode;
-        pill.classList.add("is-default");
-        pill.classList.remove("is-set");
-        if(state.named && !state.named[c] && this.placeholder){
+        var v=this, ci=parseInt(this.getAttribute("data-c"),10), p=this.parentNode;
+        p.classList.add("is-default");
+        p.classList.remove("is-set");
+        if(state.named && !state.named[ci] && this.placeholder){
           this.dataset.ph = this.placeholder;
           this.placeholder = "";
         }
@@ -337,10 +473,10 @@
   }
 
   function updateTotals(){
-    var t = totals(), lead = leaderIdx(t);
+    var tot = totals(), lead = leaderIdx(tot);
     var tiles = document.querySelectorAll(".total");
     for(var c=0;c<tiles.length;c++){
-      tiles[c].querySelector("[data-total]").textContent = t[c];
+      tiles[c].querySelector("[data-total]").textContent = tot[c];
       tiles[c].classList.toggle("leader", lead.indexOf(c)!==-1);
     }
   }
@@ -366,14 +502,15 @@
     else state.rows = [ emptyRow() ];
     render(); save();
   }
-  function doNewTable(){ state.rows=[ emptyRow() ]; render(); save(); toast("Tablo sıfırlandı"); }
-  function doNewGame(){ state = newState(state.mode); render(); save(); toast("Yeni oyun başladı"); }
+  function doNewTable(){ state.rows=[ emptyRow() ]; render(); save(); toast(t("toastTableReset")); }
+  function doNewGame(){ state = newState(state.mode); render(); save(); toast(t("toastNewGame")); }
 
   function switchMode(mode){
     if(mode===state.mode) return;
     var apply = function(){ state = newState(mode); render(); save(); };
     if(hasScores()){
-      confirmAsk("Düzen değişsin mi?", "Eşli/eşsiz değişince mevcut skorlar sıfırlanır.", "Evet, değiştir", apply);
+      var c = t("confirmMode");
+      confirmAsk(c.title, c.msg, c.ok, apply);
     }else{ apply(); }
   }
 
@@ -393,21 +530,22 @@
   function decodeState(s){ try{ return JSON.parse(decodeURIComponent(escape(atob(s)))); }catch(e){ return null; } }
   function copyLink(){
     var enc = encodeState();
-    if(!enc){ toast("Link oluşturulamadı"); return; }
+    if(!enc){ toast(t("toastLinkFail")); return; }
     var url = location.origin + location.pathname + "#g=" + enc;
     if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(url).then(function(){ toast("Yedek linki kopyalandı"); }, function(){ fallbackCopy(url); });
+      navigator.clipboard.writeText(url).then(function(){ toast(t("toastLinkCopied")); }, function(){ fallbackCopy(url); });
     }else fallbackCopy(url);
   }
   function fallbackCopy(url){
     var ta = document.createElement("textarea");
     ta.value = url; document.body.appendChild(ta); ta.select();
-    try{ document.execCommand("copy"); toast("Yedek linki kopyalandı"); }
-    catch(e){ prompt("Linki kopyala:", url); }
+    try{ document.execCommand("copy"); toast(t("toastLinkCopied")); }
+    catch(e){ prompt(t("copyLink")+":", url); }
     document.body.removeChild(ta);
   }
 
   // ---- events ----
+  document.getElementById("lang-btn").addEventListener("click", toggleLang);
   document.getElementById("seg-theme").addEventListener("click", function(e){
     var b = e.target.closest("button"); if(b) applyTheme(b.getAttribute("data-theme"));
   });
@@ -417,10 +555,12 @@
   document.getElementById("add-el").onclick = addEl;
   document.getElementById("undo").onclick = undo;
   document.getElementById("new-table").onclick = function(){
-    confirmAsk("Yeni tablo?", "Tüm el puanları silinecek. Oyuncu isimleri aynı kalacak. Emin misiniz?", "Evet, sıfırla", doNewTable);
+    var c = t("confirmNewTable");
+    confirmAsk(c.title, c.msg, c.ok, doNewTable);
   };
   document.getElementById("new-game").onclick = function(){
-    confirmAsk("Yeni oyun?", "Tablo ve oyuncu isimleri sıfırlanacak. Emin misiniz?", "Evet, başla", doNewGame);
+    var c = t("confirmNewGame");
+    confirmAsk(c.title, c.msg, c.ok, doNewGame);
   };
   document.getElementById("copy-link").onclick = copyLink;
   document.getElementById("ov-cancel").onclick = closeOverlay;
@@ -440,6 +580,7 @@
     }
   }
   (function init(){
+    lang = detectLang();
     applyTheme(loadTheme());
     if(window.matchMedia){
       window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function(){
@@ -451,12 +592,13 @@
       if(dec && dec.cols){
         state = dec; normalize(); save();
         history.replaceState(null,"",location.pathname);
+        applyLang(lang);
         render(); return;
       }
     }
     state = loadSaved() || newState("essiz");
     normalize();
-    render();
+    applyLang(lang);
   })();
 })();
 </script>
