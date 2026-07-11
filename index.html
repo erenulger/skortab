@@ -241,6 +241,7 @@
   #board.dense .pill{padding:8px 5px}
   #board.dense .pill input.nm{font-size:12.5px}
   #board.dense .pill .pen{display:none}
+  #board.dense .pill .rm{width:16px;height:16px;font-size:10px;top:-5px;left:-5px}
   #board.dense .total{min-height:56px;border-radius:14px}
   #board.dense .total .v{font-size:20px}
   #board.dense .total.leader::after{top:4px;right:6px;font-size:10px}
@@ -254,6 +255,10 @@
   .pill input.nm::placeholder{color:inherit;opacity:.85}
   .pill input.nm:focus::placeholder{opacity:0}
   .pill .pen{position:absolute;top:5px;right:9px;line-height:0;pointer-events:none;transition:opacity .15s}
+  .pill .rm{position:absolute;top:-6px;left:-6px;z-index:2;width:18px;height:18px;border-radius:50%;border:0;cursor:pointer;padding:0;
+    background:var(--danger);color:#fff;font:inherit;font-size:11px;font-weight:700;line-height:1;display:flex;align-items:center;justify-content:center;
+    box-shadow:0 1px 3px rgba(0,0,0,.28);transition:transform .1s}
+  .pill .rm:active{transform:scale(.9)}
   .pill:focus-within .pen{opacity:0}
   .pill:focus-within{border-style:solid;border-color:var(--head);box-shadow:0 0 0 3px var(--pillsoft)}
   .pill.is-set{background:var(--head);color:var(--txt)}
@@ -420,9 +425,12 @@
       addRound: "Yeni el",
       addPlayer: "Oyuncu ekle",
       addTeam: "Takım ekle",
+      removePlayer: "Oyuncu çıkar",
+      removeTeam: "Takım çıkar",
       playerBase: "Oyuncu",
       teamBase: "Takım",
       toastMaxPlayers: "En fazla 8 oyuncu eklenebilir",
+      confirmRemove: { title:"“{name}” silinsin mi?", msg:"Bu sütun ve tüm puanları tablodan kaldırılacak.", ok:"Evet, sil" },
       undo: "Son eli geri al",
       newTable: "Yeni tablo",
       newGame: "Yeni oyun",
@@ -470,9 +478,12 @@
       addRound: "New round",
       addPlayer: "Add player",
       addTeam: "Add team",
+      removePlayer: "Remove player",
+      removeTeam: "Remove team",
       playerBase: "Player",
       teamBase: "Team",
       toastMaxPlayers: "You can add up to 8 players",
+      confirmRemove: { title:"Remove “{name}”?", msg:"This column and all its scores will be removed.", ok:"Yes, remove" },
       undo: "Undo last round",
       newTable: "New table",
       newGame: "New game",
@@ -572,7 +583,7 @@
   }
 
   // ---- state ----
-  var MAX_COLS = 8;
+  var MAX_COLS = 8, MIN_COLS = 2;
   function colName(mode, i){
     var arr = mode==="esli" ? t("team") : t("player");
     if(i < arr.length) return arr[i];
@@ -649,13 +660,15 @@
     var addBtn = document.getElementById("add-player");
     document.getElementById("lbl-addplayer").textContent = state.mode==="esli" ? t("addTeam") : t("addPlayer");
     addBtn.disabled = n>=MAX_COLS;
+    var rmLabel = state.mode==="esli" ? t("removeTeam") : t("removePlayer");
 
     var h = "";
     for(var c=0;c<n;c++){
       var isSet = !!(state.named && state.named[c]);
       var val = isSet ? state.cols[c] : "";
       var ph = colName(state.mode, c);
-      h += "<div class='pill col"+(c%4)+" "+(isSet?"is-set":"is-default")+"'>"+
+      var rm = n>MIN_COLS ? "<button type='button' class='rm' data-rm='"+c+"' aria-label='"+escapeHtml(rmLabel+": "+state.cols[c])+"' title='"+escapeHtml(rmLabel)+"'>×</button>" : "";
+      h += "<div class='pill col"+(c%4)+" "+(isSet?"is-set":"is-default")+"'>"+ rm +
              "<input class='nm' type='text' maxlength='16' data-c='"+c+"' aria-label='"+escapeHtml(ph)+"' "+
                     "value='"+escapeHtml(val)+"' placeholder='"+escapeHtml(ph)+"'>"+ PEN +
            "</div>";
@@ -673,8 +686,8 @@
 
     board.querySelectorAll(".pill").forEach(function(pill){
       var inp = pill.querySelector("input.nm");
-      pill.addEventListener("mousedown", function(e){ if(e.target!==inp){ e.preventDefault(); inp.focus(); } });
-      pill.addEventListener("touchstart", function(e){ if(e.target!==inp){ inp.focus(); } }, {passive:true});
+      pill.addEventListener("mousedown", function(e){ if(e.target.closest(".rm")) return; if(e.target!==inp){ e.preventDefault(); inp.focus(); } });
+      pill.addEventListener("touchstart", function(e){ if(e.target.closest(".rm")) return; if(e.target!==inp){ inp.focus(); } }, {passive:true});
       inp.addEventListener("focus", function(){
         var v=this, ci=parseInt(this.getAttribute("data-c"),10), p=this.parentNode;
         p.classList.add("is-default");
@@ -690,6 +703,9 @@
     });
     board.querySelectorAll(".cellbox input").forEach(function(inp){
       inp.addEventListener("input", onCellInput);
+    });
+    board.querySelectorAll(".pill .rm").forEach(function(btn){
+      btn.addEventListener("click", function(){ removePlayer(parseInt(this.getAttribute("data-rm"),10)); });
     });
 
     var onlyEmpty = state.rows.length===1 && state.rows[0].every(function(v){ return v===0; });
@@ -729,6 +745,21 @@
     render(); save();
     var inp = document.querySelector("input.nm[data-c='"+(state.cols.length-1)+"']");
     if(inp){ inp.focus(); inp.scrollIntoView({block:"center", behavior:"smooth"}); }
+  }
+  function removePlayer(c){
+    if(state.cols.length <= MIN_COLS) return;
+    if(isNaN(c) || c<0 || c>=state.cols.length) return;
+    var doRemove = function(){
+      state.cols.splice(c,1);
+      state.named.splice(c,1);
+      for(var r=0;r<state.rows.length;r++) state.rows[r].splice(c,1);
+      render(); save();
+    };
+    var hasData = state.named[c] || state.rows.some(function(row){ return row[c]!==0; });
+    if(hasData){
+      var conf = t("confirmRemove");
+      confirmAsk(conf.title.replace("{name}", state.cols[c]), conf.msg, conf.ok, doRemove);
+    }else{ doRemove(); }
   }
   function addEl(){
     state.rows.push(emptyRow());
