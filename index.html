@@ -241,7 +241,7 @@
   #board.dense .pill{padding:8px 5px}
   #board.dense .pill input.nm{font-size:12.5px}
   #board.dense .pill .pen{display:none}
-  #board.dense .pill .rm{width:16px;height:16px;font-size:10px;top:-5px;left:-5px}
+  #board.dense .pill .rm{width:15px;height:15px;font-size:11px;top:1px;left:2px}
   #board.dense .total{min-height:56px;border-radius:14px}
   #board.dense .total .v{font-size:20px}
   #board.dense .total.leader::after{top:4px;right:6px;font-size:10px}
@@ -255,10 +255,12 @@
   .pill input.nm::placeholder{color:inherit;opacity:.85}
   .pill input.nm:focus::placeholder{opacity:0}
   .pill .pen{position:absolute;top:5px;right:9px;line-height:0;pointer-events:none;transition:opacity .15s}
-  .pill .rm{position:absolute;top:-6px;left:-6px;z-index:2;width:18px;height:18px;border-radius:50%;border:0;cursor:pointer;padding:0;
-    background:var(--danger);color:#fff;font:inherit;font-size:11px;font-weight:700;line-height:1;display:flex;align-items:center;justify-content:center;
-    box-shadow:0 1px 3px rgba(0,0,0,.28);transition:transform .1s}
+  .pill .rm{position:absolute;top:2px;left:6px;z-index:2;width:18px;height:18px;border-radius:50%;border:0;cursor:pointer;padding:0;
+    background:none;color:currentColor;opacity:.4;font:inherit;font-size:13px;font-weight:500;line-height:1;
+    display:flex;align-items:center;justify-content:center;transition:opacity .15s,transform .1s}
+  .pill .rm:hover{opacity:.85}
   .pill .rm:active{transform:scale(.9)}
+  .pill:focus-within .rm{opacity:0;pointer-events:none}
   .pill:focus-within .pen{opacity:0}
   .pill:focus-within{border-style:solid;border-color:var(--head);box-shadow:0 0 0 3px var(--pillsoft)}
   .pill.is-set{background:var(--head);color:var(--txt)}
@@ -755,11 +757,8 @@
       for(var r=0;r<state.rows.length;r++) state.rows[r].splice(c,1);
       render(); save();
     };
-    var hasData = state.named[c] || state.rows.some(function(row){ return row[c]!==0; });
-    if(hasData){
-      var conf = t("confirmRemove");
-      confirmAsk(conf.title.replace("{name}", state.cols[c]), conf.msg, conf.ok, doRemove);
-    }else{ doRemove(); }
+    var conf = t("confirmRemove");
+    confirmAsk(conf.title.replace("{name}", state.cols[c]), conf.msg, conf.ok, doRemove);
   }
   function addEl(){
     state.rows.push(emptyRow());
