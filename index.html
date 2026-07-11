@@ -260,7 +260,7 @@
     display:flex;align-items:center;justify-content:center;transition:opacity .15s,transform .1s}
   .pill .rm:hover{opacity:.85}
   .pill .rm:active{transform:scale(.9)}
-  .pill:focus-within .rm{opacity:0;pointer-events:none}
+  .pill input.nm:focus ~ .rm{opacity:0;pointer-events:none}
   .pill:focus-within .pen{opacity:0}
   .pill:focus-within{border-style:solid;border-color:var(--head);box-shadow:0 0 0 3px var(--pillsoft)}
   .pill.is-set{background:var(--head);color:var(--txt)}
@@ -670,9 +670,9 @@
       var val = isSet ? state.cols[c] : "";
       var ph = colName(state.mode, c);
       var rm = n>MIN_COLS ? "<button type='button' class='rm' data-rm='"+c+"' aria-label='"+escapeHtml(rmLabel+": "+state.cols[c])+"' title='"+escapeHtml(rmLabel)+"'>×</button>" : "";
-      h += "<div class='pill col"+(c%4)+" "+(isSet?"is-set":"is-default")+"'>"+ rm +
+      h += "<div class='pill col"+(c%4)+" "+(isSet?"is-set":"is-default")+"'>"+
              "<input class='nm' type='text' maxlength='16' data-c='"+c+"' aria-label='"+escapeHtml(ph)+"' "+
-                    "value='"+escapeHtml(val)+"' placeholder='"+escapeHtml(ph)+"'>"+ PEN +
+                    "value='"+escapeHtml(val)+"' placeholder='"+escapeHtml(ph)+"'>"+ PEN + rm +
            "</div>";
     }
     for(var c2=0;c2<n;c2++){
